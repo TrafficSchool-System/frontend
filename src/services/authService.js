@@ -40,6 +40,15 @@ const getCurrentUser = () => {
   return user ? JSON.parse(user) : null;
 };
 
+// Lägg till i authService.js efter getCurrentUser
+const isTokenValid = () => {
+  const token = localStorage.getItem("authToken");
+  const user = localStorage.getItem("user");
+  
+  // Enkel validering - du kan utöka med JWT expiry check
+  return !!(token && user);
+};
+
 // Kontrollera om inloggad
 const isAuthenticated = () => {
   return !!localStorage.getItem("authToken");
@@ -52,4 +61,5 @@ export default {
   logout,
   getCurrentUser,
   isAuthenticated,
+  isTokenValid
 };
