@@ -33,15 +33,8 @@ apiClient.interceptors.response.use(
         return response; 
     }, 
     (error) => {
-        let errorMessage = "Något gick fel"; 
-
-        if (error.response?.data?.messagae) {
-            errorMessage = error.response.data.messagae;
-        } else if (error.request) {
-            errorMessage = "Kunde inte ansluta till servern."; 
-        }
-
-        return Promise.reject(new Error(errorMessage));
+        // Skicka vidare originalet så att komponenterna kan komma åt err.response
+        return Promise.reject(error);
     }
 ); 
 

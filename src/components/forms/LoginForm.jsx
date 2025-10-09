@@ -12,13 +12,11 @@ import Button from "../ui/Button";
 const LoginForm = ({ onSucces, onError, onSwitchToRegister }) => {
     const [email, setEmail] = useState(''); 
     const [loading, setLoading] = useState(false); 
-    const [error, setError] = useState(''); 
 
 
     const handleSubmit = async (e) => {
         e.preventDefault(); //stoppar sidan från att laddas om när man skickar formuläret.
         setLoading(true) //visar att knappen/formuläret laddar
-        setError(''); //rensar gamla fel
     
 
         try {
@@ -26,7 +24,6 @@ const LoginForm = ({ onSucces, onError, onSwitchToRegister }) => {
             onSucces?.(email, response); //Kör onSucces om det finns och skickar med email + svaret
         } catch (err) {
             const errorMessage = err.response?.data?.message || 'Något gick fel'; 
-            setError(errorMessage); 
             onError?.(errorMessage);
         } finally {
             setLoading(false); 
@@ -36,12 +33,6 @@ const LoginForm = ({ onSucces, onError, onSwitchToRegister }) => {
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <h2 className="heading">Logga in</h2>
-
-            {error && (
-                <Message type="error">
-                    {error}
-                </Message>
-            )}
 
             <Input
                 label="Email"

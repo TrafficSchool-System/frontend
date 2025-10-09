@@ -32,12 +32,12 @@ export const useAuth = () =>{
                     if(existingToken) {
                         try{
                             // Validera befintlig JWT genom att hämta användardata
-                            const user = authService.getCurrentUser();
+                            const user = await authService.validateTokenWithBackend();
                             if(user) {
                                 setUser(user); 
                                 console.log('🔑 Befintlig session återställd:', user);
                             } else {
-                                throw new Error('Ingen användare i localStorage'); 
+                                console.log('❌ Token ogiltig, kräver ny inloggning'); 
                             }
                         } catch (error) {
                             console.warn('⚠️ Ogiltig befintlig session, rensar localStorage'); 

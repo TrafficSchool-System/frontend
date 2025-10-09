@@ -12,8 +12,7 @@ const RegisterForm = ({ onSuccess, onError, onSwitchToLogin}) => {
         email: ''
     }); 
 
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(''); 
+    const [loading, setLoading] = useState(false); 
 
 
     const handleChange = (e) => {
@@ -27,14 +26,12 @@ const RegisterForm = ({ onSuccess, onError, onSwitchToLogin}) => {
     const handleSubmit = async (e) => {
         e.preventDefault(); 
         setLoading(true); 
-        setError(''); 
 
         try {
             const response = await userService.registerUser(formData);
             onSuccess?.(formData.email, response);
         } catch (err) {
             const errorMessage = err.response?.data?.message || 'Registrering misslyckades'; 
-            setError(errorMessage); 
             onError?.(errorMessage);
         } finally {
             setLoading(false); 
@@ -47,12 +44,6 @@ const RegisterForm = ({ onSuccess, onError, onSwitchToLogin}) => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
             <h2 className="heading">Skapa konto</h2>
-
-            {error && (
-                <Message type="error">
-                    {error}
-                </Message>
-            )}
 
             <Input
                 label="Förnamn"
