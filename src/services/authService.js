@@ -28,6 +28,25 @@ const verifyTokenWithJwt = async (token) => {
     return response.data //Retunera JwtResponseDTO
 }; 
 
+const validateTokenWithBackend = async () => {
+  const token = localStorage.getItem("authToken"); 
+  if(!token) {
+    return null; 
+  }
+
+  try {
+    // Anropa en skyddad endpoint för att validera token
+    const response = await axios.get('users/me'); 
+    return response.data; 
+
+  } catch (error) {
+    //Token är ogiltig - rensa localStorage
+    logout(); 
+    return null; 
+
+  }
+}; 
+
 // Logga ut
 const logout = () => {
   localStorage.removeItem("authToken");
@@ -61,5 +80,6 @@ export default {
   logout,
   getCurrentUser,
   isAuthenticated,
-  isTokenValid
+  isTokenValid,
+  validateTokenWithBackend
 };
