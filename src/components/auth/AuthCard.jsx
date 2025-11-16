@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import Card from '../ui/Card';
 import Message from '../ui/Message';
 import RegisterForm from '../forms/RegisterForm';
@@ -6,16 +6,16 @@ import LoginForm from '../forms/LoginForm';
 
 const AuthCard = () => {
     const [showRegister, setShowRegister] = useState(false); 
-    const [message, setMessage] = useState({ text: '', type: ''}); 
+    const [message, setMessage] = useState({ text: '', type: '' }); 
 
-    const clearMessage = () => setMessage({ text: '', type: ''}); 
+    const clearMessage = () => setMessage({ text: '', type: '' }); 
 
     const showSuccessMessage = (text) => {
         setMessage({ text, type: 'success' }); 
     };
 
     const showErrorMessage = (text) => {
-        setMessage({text, type: 'error' }); 
+        setMessage({ text, type: 'error' }); 
     };
 
     const handleLoginSuccess = (email) => {
@@ -33,7 +33,7 @@ const AuthCard = () => {
         showErrorMessage(errorMessage); 
     };
 
-    const SwitchToRegister = () =>{
+    const SwitchToRegister = () => {
         clearMessage(); 
         setShowRegister(true);
     };
@@ -43,13 +43,14 @@ const AuthCard = () => {
         setShowRegister(false); 
     };
 
-
     return (
         <Card>
             {message.text && (
-                <Message type={message.type} className='mb-4'>
-                    {message.text}
-                </Message>
+                <Message 
+                    type={message.type} 
+                    message={message.text} 
+                    className="mb-4" 
+                />
             )}
 
             {showRegister ? (
@@ -58,7 +59,6 @@ const AuthCard = () => {
                     onError={handleError}
                     onSwitchToLogin={switchToLogin}
                 />
-
             ) : (
                 <LoginForm
                     onSucces={handleLoginSuccess}
@@ -68,8 +68,6 @@ const AuthCard = () => {
             )}
         </Card>
     ); 
-
-
 };
 
-export default AuthCard; 
+export default AuthCard;
