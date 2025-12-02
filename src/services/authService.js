@@ -1,7 +1,7 @@
 import axios from "../api/config";
 
 
-const AUTH_URL = "/auth";
+const AUTH_URL = "/user-service/api/auth"; // Gateway prefix + service path
 
 // POST /api/auth/login - Skicka magic link
 const sendMagicLink = async (email) => {
@@ -36,7 +36,7 @@ const validateTokenWithBackend = async () => {
 
   try {
     // Anropa en skyddad endpoint för att validera token
-    const response = await axios.get('users/me'); 
+    const response = await axios.get('/user-service/api/users/me'); 
     return response.data; 
 
   } catch (error) {

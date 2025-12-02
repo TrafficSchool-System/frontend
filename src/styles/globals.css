@@ -5,7 +5,9 @@
     /* CUSTOM FÄRGER - Skapar bg-traffic-yellow, text-traffic-black osv */
     --color-traffic-black: #000000;
     --color-traffic-yellow: #FFD700;
+    --color-traffic-yellow-hover: #FFC300; /* lite mörkare variant */
     --color-traffic-white: #FFFFFF;
+    
 
     /* GRÅSKALA - För bakgrunder och gränser */
     --color-gray-50: #F9FAFB;
