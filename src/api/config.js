@@ -1,7 +1,7 @@
 import axios from "axios";
 
 //Backend körs på port 8080
-const API_BASE_URL = "http://localhost:8080/api"; 
+const API_BASE_URL = "http://localhost:8080"; 
 
 //Skapa axios-instans
 const apiClient = axios.create({

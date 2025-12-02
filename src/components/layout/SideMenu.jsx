@@ -1,102 +1,110 @@
 // src/components/layout/SideMenu.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { X } from "lucide-react";
 
 const menuItems = [
-  { label: "Start", path: "#" },
+  { label: "Start", path: "/" },
   { label: "Quiz", path: "#" },
-  { label: "Resultat", path: "#" },
-  { label: "Profil", path: "#" }
+  { label: "Resultat", path: "/results" },
+  { label: "Profil", path: "/profile" },
 ];
 
-// SideMenu - Komponenten tar emot en prop ´onLogout´ som hanterar utloggning
-const SideMenu = ({ onLogout }) => {
-
-  // Hook för att navigera mellan sidor
+const SideMenu = ({ onLogout, open, setOpen }) => {
   const navigate = useNavigate();
-  // State variabel som styr om quiz-alternativ ska visas eller döljas i menyn
-  const [showQuizOptions, setShowQuizOptions] = useState(false); 
+  const [showQuizOptions, setShowQuizOptions] = useState(false);
 
-  // Funktion som hanterar utloggningen
-  const handleLogout = async () => {
-    if (onLogout) onLogout(); // Anropa useAuth.logout()
-    navigate("/login"); // Gå till login-sidan
+  const handleLogout = () => {
+    if (onLogout) onLogout();
+    navigate("/login");
+    setOpen(false);
   };
 
-  // Funktion som växlar visningen av quizalternativen
-  const toggleQuizOptions = () => {
+  return (
+    <>
+      {/* OVERLAY — BOTH MOBILE & DESKTOP */}
+      {open && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-40 z-40"
+          onClick={() => setOpen(false)}
+        ></div>
+      )}
 
-    // Använder tidigare värde av showQuizOptions för att växla mellan true/false
-    setShowQuizOptions((prev) => !prev);  
-  };
+      {/* SIDEMENU PANEL */}
+      <nav
+        className={`
+          fixed top-0 left-0 h-full bg-gray-100 border-r border-gray-300 
+          w-64 p-6 flex flex-col z-50 transition-transform duration-300
 
-return (
-
-    // Navigationselementet som utgör hela sidomenyn
-    <nav className="w-48 bg-gray-100 border-1 border-gray-300 min-h-screen flex flex-col py-8 px-4">
-
-      {/* Loopa igenom alla menyobjekt som finns definierade i menuItems */}
-      {menuItems.map((item) => (
-
-        // React.Fragment används för att kunna returnera flera element utan extra wrapper-div
-        <React.Fragment key={item.label}>
-
-          {/* Om menyobjektet är "Quiz", visa en knapp som kan expandera/visa undermenyer */}
-          {item.label === "Quiz" ? (
-            <>
-
-             {/* Huvudknappen för Quiz – klick togglar visningen av quizalternativ */}
-              <button
-                onClick={toggleQuizOptions}
-                className="w-full text-left py-2 px-2 rounded hover:bg-traffic-yellow transition mb-1"
-              >
-                {item.label}
-              </button>
-
-              {/* Om showQuizOptions är true, visa undermenyerna */}
-              {showQuizOptions && (
-                <div className="ml-4">
-
-                  {/* Knapp för att gå till övningsquiz */}
-                  <button
-                    onClick={() => navigate("/quiz/practice")}
-                    className="w-full text-left py-2 px-2 rounded hover:bg-traffic-yellow transition mb-1"
-                  >
-                    Övningsquiz
-                  </button>
-
-                  {/* Knapp för att gå till slutprov */}
-                  <button
-                    onClick={() => navigate("/quiz/final")}
-                    className="w-full text-left py-2 px-2 rounded hover:bg-traffic-yellow transition mb-1"
-                  >
-                    Slutprov
-                  </button>
-                </div>
-              )}
-            </>
-          ) : (
-
-            // För alla andra menyobjekt (Start, Resultat, Profil etc.)
-            // skapa en vanlig knapp som navigerar till respektive sida
-            <button
-              onClick={() => navigate(item.path)}
-              className="w-full text-left py-2 px-2 rounded hover:bg-traffic-yellow transition mb-1"
-            >
-              {item.label}
-            </button>
-          )}
-        </React.Fragment>
-      ))}
-
-      {/* Logga ut-knapp längst ner i menyn */}
-      <button
-        onClick={handleLogout}
-        className="w-full text-center py-2 px-2 rounded text-gray-500 hover:bg-traffic-yellow transition mt-auto cursor-pointer"
+          ${open ? "translate-x-0" : "-translate-x-full"}
+        `}
       >
-        Logga ut
-      </button>
-    </nav>
+        {/* MOBILE CLOSE BUTTON */}
+        <button className="md:hidden mb-6" onClick={() => setOpen(false)}>
+          <X size={28} />
+        </button>
+
+        {/* MENU ITEMS */}
+        <div className="flex-1">
+          {menuItems.map((item) => (
+            <React.Fragment key={item.label}>
+              {item.label === "Quiz" ? (
+                <>
+                  <button
+                    onClick={() => setShowQuizOptions((prev) => !prev)}
+                    className="w-full text-left py-2 px-2 rounded hover:bg-traffic-yellow mb-1"
+                  >
+                    Quiz
+                  </button>
+
+                  {showQuizOptions && (
+                    <div className="ml-4">
+                      <button
+                        onClick={() => {
+                          navigate("/quiz/practice");
+                          setOpen(false);
+                        }}
+                        className="w-full text-left py-2 px-2 rounded hover:bg-traffic-yellow mb-1"
+                      >
+                        Övningsquiz
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          navigate("/quiz/final");
+                          setOpen(false);
+                        }}
+                        className="w-full text-left py-2 px-2 rounded hover:bg-traffic-yellow mb-1"
+                      >
+                        Slutprov
+                      </button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <button
+                  onClick={() => {
+                    navigate(item.path);
+                    setOpen(false);
+                  }}
+                  className="w-full text-left py-2 px-2 rounded hover:bg-traffic-yellow mb-1"
+                >
+                  {item.label}
+                </button>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+
+        {/* LOG OUT — ALWAYS AT BOTTOM */}
+        <button
+          onClick={handleLogout}
+          className="w-full py-2 px-2 rounded text-gray-600 hover:bg-traffic-yellow"
+        >
+          Logga ut
+        </button>
+      </nav>
+    </>
   );
 };
 

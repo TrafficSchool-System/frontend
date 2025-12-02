@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
-import getQuestionsBySubject from "../services/quizService";
-import QuizSubjectSelector from "../components/quiz/quizSubjectSelector";
+import QuizSubjectSelector from "../components/quiz/QuizSubjectSelector";
 import QuestionLimitSelector from "../components/quiz/QuestionLimitSelector";
-import QuizCard from "../components/quiz/quizCard";
-import QuizNavigation from "../components/quiz/quizNavigation";
+import QuizCard from "../components/quiz/QuizCard";
+import QuizNavigation from "../components/quiz/QuizNavigation";
 import ProgressBar from "../components/ui/ProgressBar";
 import ResultPanel from "../components/quiz/ResultPanel";
+import QuizInfo from "../components/quiz/QuizInfo";
+import quizService from "../services/quizService";
 
 const QuizPage = () => {
   // === STATE ===
-  const [subjectId, setSubjectId] = useState(null);
+  const [subjects, setSubjects] = useState([]);
+  const [subjectConfirmed, setSubjectConfirmed] = useState(false);
+
   const [limit, setLimit] = useState(10);
   const [limitConfirmed, setLimitConfirmed] = useState(false);
 
@@ -26,17 +29,22 @@ const QuizPage = () => {
 
   // === HÄMTA FRÅGOR NÄR ÄMNE OCH LIMIT BEKRÄFTATS ===
   useEffect(() => {
-    if (!subjectId || !limitConfirmed) return;
+    if (!subjectConfirmed || !limitConfirmed) return;
 
     const loadQuestions = async () => {
       setLoading(true);
       setError(null);
       try {
-        const data = await getQuestionsBySubject(subjectId, limit);
+        console.log("Requesting questions with subjects:", subjects, "limit:", limit);
+        const data = await quizService.getQuestionsBySubjects(subjects, limit);
+        console.log("Received questions data:", data);
+        console.log("First question:", data[0]);
         setQuestions(data);
         setCurrentIndex(0);
         setAnswers({});
       } catch (err) {
+        console.error("Error loading questions:", err);
+        console.error("Error response:", err.response?.data);
         setError("Kunde inte hämta frågor");
       } finally {
         setLoading(false);
@@ -44,13 +52,18 @@ const QuizPage = () => {
     };
 
     loadQuestions();
-  }, [subjectId, limitConfirmed, limit]);
+  }, [subjectConfirmed, limitConfirmed, subjects, limit]);
 
-  // === STEG 1: Välj ämne ===
-  if (!subjectId) {
+  // === STEG 1: Välj ämnen ===
+  if (!subjectConfirmed) {
     return (
       <div className="max-w-2xl mx-auto p-6">
-        <QuizSubjectSelector subjectId={subjectId} setSubjectId={setSubjectId} />
+        <QuizSubjectSelector
+          subjects={subjects}
+          setSubjects={setSubjects}
+          onNext={() => subjects.length > 0 && setSubjectConfirmed(true)}
+        />
+        <QuizInfo />
       </div>
     );
   }
@@ -83,13 +96,19 @@ const QuizPage = () => {
           setShowResult(false);
           setAnswers({});
           setCurrentIndex(0);
-          setLimitConfirmed(false); // Börja om från att välja antal frågor
+          setSubjectConfirmed(false);
+          setLimitConfirmed(false);
         }}
       />
     );
   }
 
   const currentQuestion = questions[currentIndex];
+
+  // Säkerhetskontroll
+  if (!currentQuestion) {
+    return <p className="p-6">Laddar fråga...</p>;
+  }
 
   // === Hantera svar ===
   const handleSelect = (answer) => {
@@ -108,11 +127,11 @@ const QuizPage = () => {
   };
 
   const handleFinish = () => {
-    if (!allAnswered) {
-      alert("Du måste svara på alla frågor innan du rättar provet!");
-      return;
-    }
-    setShowResult(true);
+      if (!allAnswered) {
+        alert("Du måste svara på alla frågor innan du rättar provet!");
+        return;
+      }
+      setShowResult(true);
   };
 
   // === RENDER QUIZ ===

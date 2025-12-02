@@ -1,6 +1,6 @@
 import axios from "../api/config";
 
-const USER_URL = "/users";
+const USER_URL = "/user-service/api/users"; // Gateway prefix + service path
 
 // POST /api/users/register - Registrera ny användare
 const registerUser = async (userData) => {

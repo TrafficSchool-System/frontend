@@ -10,6 +10,7 @@ import MainLayout from './components/layout/MainLayout';
 import Dashboard from './pages/Dashboard';
 import LoginPage from './pages/LoginPage';
 import QuizPage from './pages/quizPage';
+import FinalExamPage from './pages/FinalExamPage';
 
 function App() {
   const { user, loading, error, login, logout, clearError } = useAuth();
@@ -47,6 +48,7 @@ function App() {
 
             <Route path="/" element={<Dashboard user={user} />} />
             <Route path="/quiz/practice" element={<QuizPage />} />
+            <Route path="quiz/final" element={<FinalExamPage />} />
 
             {/* framtida sidor – alla får SideMenu */}
             {/* <Route path="/profile" element={<ProfilePage />} /> */}
