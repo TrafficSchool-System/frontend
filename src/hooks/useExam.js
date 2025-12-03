@@ -32,6 +32,10 @@ export const useExam = () => {
   // Visar om hooken håller på att ladda data (t.ex. återupptar session)
   const [loading, setLoading] = useState(true);
 
+  // Result state
+  const [result, setResult] = useState(null);
+  const [showResult, setShowResult] = useState(false);
+
   // -------------------------------------------------------
   // 📌 Vid första laddning: kolla om det finns ett pågående prov
   // -------------------------------------------------------
@@ -154,8 +158,12 @@ export const useExam = () => {
     if (!userId) return;
 
     await examService.finishExam(userId);
-    setStarted(false);
-    alert("Provet är klart!");
+    
+    // Hämta resultat
+    const examResult = await examService.getExamResult(userId); 
+    setResult(examResult); 
+    setShowResult(true); 
+    setStarted(false); 
   };
 
   // -------------------------------------------------------
@@ -173,5 +181,7 @@ export const useExam = () => {
     startExam,
     finishExam,
     loading,
+    result, 
+    showResult,
   };
 };

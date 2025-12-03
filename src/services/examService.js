@@ -35,9 +35,16 @@ const finishExam = async (userId) => {
     return response.data; 
 }
 
+// Hämta resultat efter avslutat prov
+const getExamResult = async (userId) => {
+    const response = await axios.get(`${EXAM_URL}/result?userId=${userId}`);
+    return response.data; 
+}
+
 export default {
     startExam, 
     getExamStatus,
     saveAnswer,
     finishExam,
+    getExamResult,
 } 
