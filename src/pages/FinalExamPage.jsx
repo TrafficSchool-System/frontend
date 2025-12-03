@@ -4,6 +4,7 @@ import ProgressBar from "../components/ui/ProgressBar";
 import FinalExamIntro from "../components/exam/FinalExamIntro";
 import ExamTimer from "../components/exam/ExamTimer";
 import { useExam } from "../hooks/useExam";
+import ExamResult from "../components/exam/ExamResult";
 
 const FinalExamPage = () => {
   const {
@@ -17,11 +18,18 @@ const FinalExamPage = () => {
     allAnswered,
     startExam,
     finishExam,
-    loading
+    loading,
+    result, 
+    showResult,
   } = useExam();
 
   if (loading) {
     return <p>Kontrollerar pågående session…</p>;
+  }
+
+  // Visa resultatet om provet är klart
+  if(showResult && result) {
+    return <ExamResult result={result} onRetry={startExam} />
   }
 
   if (!started) {
