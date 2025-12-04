@@ -41,10 +41,17 @@ const getExamResult = async (userId) => {
     return response.data; 
 }
 
+// Hämta alla provresultat för en användare 
+const getAllExamResults = async (userId) => {
+    const response = await axios.get(`${EXAM_URL}/results?userId=${userId}`);
+    return response.data; 
+}
+
 export default {
     startExam, 
     getExamStatus,
     saveAnswer,
     finishExam,
     getExamResult,
+    getAllExamResults,
 } 

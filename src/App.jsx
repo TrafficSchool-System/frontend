@@ -9,8 +9,9 @@ import ErrorDisplay from './components/ui/ErrorDisplay';
 import MainLayout from './components/layout/MainLayout';
 import Dashboard from './pages/Dashboard';
 import LoginPage from './pages/LoginPage';
-import QuizPage from './pages/quizPage';
+import QuizPage from './pages/QuizPage';
 import FinalExamPage from './pages/FinalExamPage';
+import ExamResultsPage from './pages/ExamResultPage';
 
 function App() {
   const { user, loading, error, login, logout, clearError } = useAuth();
@@ -49,6 +50,7 @@ function App() {
             <Route path="/" element={<Dashboard user={user} />} />
             <Route path="/quiz/practice" element={<QuizPage />} />
             <Route path="quiz/final" element={<FinalExamPage />} />
+            <Route path='/results' element={<ExamResultsPage />} />
 
             {/* framtida sidor – alla får SideMenu */}
             {/* <Route path="/profile" element={<ProfilePage />} /> */}
