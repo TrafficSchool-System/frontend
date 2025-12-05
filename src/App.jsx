@@ -49,7 +49,7 @@ function App() {
 
             <Route path="/" element={<Dashboard user={user} />} />
             <Route path="/quiz/practice" element={<QuizPage />} />
-            <Route path="quiz/final" element={<FinalExamPage />} />
+            <Route path="/quiz/final" element={<FinalExamPage />} />
             <Route path='/results' element={<ExamResultsPage />} />
 
             {/* framtida sidor – alla får SideMenu */}

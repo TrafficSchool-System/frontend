@@ -47,6 +47,12 @@ const getAllExamResults = async (userId) => {
     return response.data; 
 }
 
+// Hämta exam statestik för användare 
+const getExamStats = async (userId) => {
+    const response = await axios.get(`${EXAM_URL}/stats?userId=${userId}`);
+    return response.data; 
+}
+
 export default {
     startExam, 
     getExamStatus,
@@ -54,4 +60,5 @@ export default {
     finishExam,
     getExamResult,
     getAllExamResults,
+    getExamStats,
 } 
