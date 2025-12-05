@@ -27,12 +27,22 @@ apiClient.interceptors.request.use(
 ); 
 
 
-//Hantera fel
+//Hantera fel och retry vid 503
 apiClient.interceptors.response.use(
     (response) => {
         return response; 
     }, 
-    (error) => {
+    async (error) => {
+        const config = error.config;
+        
+        // Retry vid 503 (Service Unavailable) - när service inte är redo än
+        if (error.response?.status === 503 && !config._retry) {
+            config._retry = true;
+            console.log('🔄 Service unavailable, retrying in 2 seconds...');
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Vänta 2 sekunder
+            return apiClient(config); // Försök igen
+        }
+        
         // Skicka vidare originalet så att komponenterna kan komma åt err.response
         return Promise.reject(error);
     }
