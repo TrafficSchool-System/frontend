@@ -1,13 +1,14 @@
 /* globals.css - TAILWIND CSS V4 KORREKT SYNTAX */
-@import "tailwindcss"; 
+@import "tailwindcss";
 
 @theme {
     /* CUSTOM FÄRGER - Skapar bg-traffic-yellow, text-traffic-black osv */
     --color-traffic-black: #000000;
     --color-traffic-yellow: #FFD700;
-    --color-traffic-yellow-hover: #FFC300; /* lite mörkare variant */
+    --color-traffic-yellow-hover: #FFC300;
+    /* lite mörkare variant */
     --color-traffic-white: #FFFFFF;
-    
+
 
     /* GRÅSKALA - För bakgrunder och gränser */
     --color-gray-50: #F9FAFB;
@@ -79,11 +80,27 @@ body {
 
 /* KOMPONENT UTILITIES med @apply */
 .btn-primary {
-    @apply px-6 py-3 bg-traffic-yellow text-traffic-black font-semibold rounded-md hover:opacity-80 transition-all cursor-pointer border-0 w-full;
+    @apply px-6 py-3 bg-traffic-yellow text-traffic-black font-semibold rounded-md hover:opacity-80 transition-all cursor-pointer border-0 inline-block disabled:cursor-not-allowed;
 }
 
 .btn-secondary {
-    @apply px-6 py-3 bg-traffic-black text-traffic-white font-semibold rounded-md hover:opacity-80 transition-all cursor-pointer border-0 w-full;
+    @apply px-6 py-3 bg-traffic-black text-traffic-white font-semibold rounded-md hover:opacity-80 transition-all cursor-pointer border-0 inline-block disabled:cursor-not-allowed;
+}
+
+.btn-link {
+    @apply text-traffic-yellow hover:underline hover:text-traffic-yellow-hover bg-transparent border-0 p-0 font-medium transition-all duration-200 cursor-pointer inline-block disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.btn-icon {
+    @apply p-2 hover:bg-gray-200 rounded transition-all cursor-pointer bg-transparent border-0;
+}
+
+.btn-menu {
+    @apply w-full text-left py-3 px-3 rounded-lg hover:bg-traffic-yellow hover:shadow-sm transition-all duration-200 cursor-pointer bg-transparent border-0 mb-2 flex items-center gap-3 font-medium text-gray-700;
+}
+
+.btn-submenu {
+    @apply w-full text-left py-2 px-3 rounded-md hover:bg-traffic-yellow hover:pl-4 transition-all duration-200 cursor-pointer bg-transparent border-0 mb-1 flex items-center gap-2 text-sm text-gray-600;
 }
 
 .card {
@@ -125,4 +142,22 @@ body {
 
 .message-success {
     @apply bg-green-100 text-green-700;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.5s ease-out forwards;
+    opacity: 0;
 }
