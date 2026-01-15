@@ -1,56 +1,64 @@
+import { useEffect, useState } from "react";
+import examService from "../../services/user/examService";
+import useError from "../useError";
 
 // -------------------------------------------------------
 // 📌 Hjälpfunktion: hämtar ID för den inloggade användaren
-
-import { useEffect, useState } from "react";
-import examService from "../../services/user/examService";
-
 // -------------------------------------------------------
 const getCurrentUserId = () => {
-    const userStr = localStorage.getItem('user'); 
-    if (userStr) {
-        const user = JSON.parse(userStr);
-        return user.id; 
-    }
+  const userStr = localStorage.getItem("user");
+  if (!userStr) return null;
 
-    return null; 
-}; 
+  try {
+    const user = JSON.parse(userStr);
+    return user?.id ?? null;
+  } catch {
+    return null;
+  }
+};
 
 // -------------------------------------------------------
 // 📌 useExamResults — Custom hook för att hämta alla provresultat
 // -------------------------------------------------------
 const useExamResults = () => {
-    const [results, setResults] = useState([]);
-    const [loading, setLoading] = useState(true); 
-    const [error, setError] = useState(null);
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchResults = async () => {
-            const userId = getCurrentUserId();
-            
-            if (!userId) {
-                setError("Du måste vara inloggad"); 
-                setLoading(false);
-                return; 
-            }
+  const { error, handleError, clearError} = useError();
 
-            try {
-                setLoading(true); 
-                const data = await examService.getAllExamResults(userId)
-                setResults(data); 
-            } catch (err) {
-                console.error("Fel vid hämtning av resultar: ", err);
-                setError("Kunde inte hämta dina provresultat"); 
-            } finally {
-                setLoading(false); 
-            }
-        };
+  const fetchResults = async () => {
+    const userId = getCurrentUserId();
 
-        fetchResults();
-    }, []);
+    if (!userId) {
+      handleError(null, "Du måste vara inloggad");
+      setLoading(false);
+      return;
+    }
 
-    return { results, loading, error };
+    try {
+      setLoading(true);
+      clearError();
 
+      const data = await examService.getAllExamResults(userId);
+      setResults(data ?? []);
+    } catch {
+      handleError(error, "Kunde inte hämta dina provresultat");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchResults();
+  }, []);
+
+  return {
+    results,
+    loading,
+    error,
+    clearError,
+    refetch: fetchResults, // 👈 gör hooken komplett & flexibel
+  };
 };
 
-export default useExamResults; 
+export default useExamResults;

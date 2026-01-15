@@ -5,6 +5,9 @@ import FinalExamIntro from "../../components/user/exam/FinalExamIntro";
 import ExamTimer from "../../components/user/exam/ExamTimer";
 import { useExam } from "../../hooks/user/useExam";
 import ExamResult from "../../components/user/exam/ExamResult";
+import Alert from "../../components/shared/ui/Alert";
+import LoadingSpinner from "../../components/shared/ui/LoadingSpinner";
+import { useState } from "react";
 
 const FinalExamPage = () => {
   const {
@@ -21,11 +24,12 @@ const FinalExamPage = () => {
     loading,
     result, 
     showResult,
+    error, 
   } = useExam();
 
-  if (loading) {
-    return <p>Kontrollerar pågående session…</p>;
-  }
+  const [showAlert, setShowAlert] = useState(true); 
+
+  if (loading) return <LoadingSpinner message="Kontrollerar session..." />;
 
   // Visa resultatet om provet är klart
   if(showResult && result) {
@@ -41,12 +45,23 @@ const FinalExamPage = () => {
     );
   }
 
-  if (!examData) return <p>Laddar prov…</p>;
+  if (!examData) return <LoadingSpinner message="Laddar prov..."/>;
 
   const currentQuestion = examData.questions[currentIndex];
 
   return (
     <div className="max-w-2xl mx-auto p-6">
+
+      {/* ALERT */}
+      {error && showAlert && (
+        <Alert
+          message={error}
+          type="error"
+          onClose={() => setShowAlert(false)}
+          className="mb-4"
+        />
+      )}
+
       <ExamTimer
         expiresAt={examData.expiresAt}
         onTimeUp={finishExam}

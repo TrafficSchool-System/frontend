@@ -17,24 +17,16 @@ const getCurrentUserId = () => {
 // 📌 useExam — Custom hook för att hantera hela provlogiken
 // -------------------------------------------------------
 export const useExam = () => {
-  // Data som backend returnerar (frågor, tid, sparade svar, mm)
   const [examData, setExamData] = useState(null);
-
-  // Om provet har startats eller inte
   const [started, setStarted] = useState(false);
-
-  // Index för frågan användaren är på just nu
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  // Objekt som lagrar användarens svar: { questionIndex: answer }
   const [answers, setAnswers] = useState({});
-
-  // Visar om hooken håller på att ladda data (t.ex. återupptar session)
   const [loading, setLoading] = useState(true);
-
-  // Result state
   const [result, setResult] = useState(null);
   const [showResult, setShowResult] = useState(false);
+
+  // Error state
+  const [error, setError] = useState(null);
 
   // -------------------------------------------------------
   // 📌 Vid första laddning: kolla om det finns ett pågående prov
@@ -44,48 +36,35 @@ export const useExam = () => {
       const userId = getCurrentUserId();
       if (!userId) {
         setLoading(false);
+        setError("Du måste vara inloggad för att se provet");
         return;
       }
 
       try {
-        // Hämta pågående prov från backend
         const data = await examService.getExamStatus(userId);
-
         if (data) {
-          // Om backend hittade en session
           setExamData(data);
           setStarted(true);
 
-          // Om backend har sparade svar → återställ dem
           if (data.savedAnswers) {
             const restoredAnswers = {};
-
-            // Matcha questionId → questionIndex
             data.questions.forEach((question, index) => {
               if (data.savedAnswers[question.id]) {
                 restoredAnswers[index] = data.savedAnswers[question.id];
               }
             });
-
             setAnswers(restoredAnswers);
 
-            // Hoppa till första obesvarade fråga
             const firstUnanswered = data.questions.findIndex(
               (q, i) => !restoredAnswers[i]
             );
-
-            if (firstUnanswered !== -1) {
-              setCurrentIndex(firstUnanswered);
-            } else {
-              // Om allt är besvarat → ställ in på sista frågan
-              setCurrentIndex(data.questions.length - 1);
-            }
+            setCurrentIndex(firstUnanswered !== -1 ? firstUnanswered : data.questions.length - 1);
           }
         }
-      } catch (error) {
-        console.error("Fel vid kontroll av session:", error);
+      } catch (err) {
+        setError("Kunde inte hämta provsessionen");
       } finally {
-        setLoading(false); // Färdigladdat
+        setLoading(false);
       }
     };
 
@@ -93,43 +72,52 @@ export const useExam = () => {
   }, []);
 
   // -------------------------------------------------------
-  // 📌 Starta provet (skickar request till backend)
+  // 📌 Starta provet
   // -------------------------------------------------------
   const startExam = async () => {
     const userId = getCurrentUserId();
     if (!userId) {
-      alert("Du måste vara inloggad för att starta provet");
+      setError("Du måste vara inloggad för att starta provet");
       return;
     }
 
-    const data = await examService.startExam(userId);
-
-    // Spara provdata och sätt startläge
-    setExamData(data);
-    setStarted(true);
-    setCurrentIndex(0);
-    setAnswers({});
-    setResult(null);        // 👈 Nollställ resultat
-    setShowResult(false);   // 👈 Dölj resultatvy
+    try {
+      const data = await examService.startExam(userId);
+      setExamData(data);
+      setStarted(true);
+      setCurrentIndex(0);
+      setAnswers({});
+      setResult(null);
+      setShowResult(false);
+      setError(null); // rensa tidigare fel
+    } catch (err) {
+      setError("Kunde inte starta provet. Försök igen senare.");
+    }
   };
 
   // -------------------------------------------------------
-  // 📌 När användaren väljer ett svar
+  // 📌 Välj svar
   // -------------------------------------------------------
   const handleSelect = async (answer) => {
     const userId = getCurrentUserId();
-    if (!userId) return;
+    if (!userId) {
+      setError("Du måste vara inloggad");
+      return;
+    }
 
-    // Uppdatera valt svar lokalt
     setAnswers(prev => ({ ...prev, [currentIndex]: answer }));
 
-    // Spara svaret i backend
-    const questionId = examData.questions[currentIndex].id;
-    await examService.saveAnswer(userId, questionId, answer);
+    try {
+      const questionId = examData.questions[currentIndex].id;
+      await examService.saveAnswer(userId, questionId, answer);
+      setError(null); // rensa tidigare fel om det gick bra
+    } catch (err) {
+      setError("Kunde inte spara svaret. Försök igen senare.");
+    }
   };
 
   // -------------------------------------------------------
-  // 📌 Gå till nästa fråga
+  // 📌 Nästa/ Föregående fråga
   // -------------------------------------------------------
   const handleNext = () => {
     if (examData && currentIndex < examData.questions.length - 1) {
@@ -137,9 +125,6 @@ export const useExam = () => {
     }
   };
 
-  // -------------------------------------------------------
-  // 📌 Gå till föregående fråga
-  // -------------------------------------------------------
   const handlePrev = () => {
     if (currentIndex > 0) {
       setCurrentIndex(i => i - 1);
@@ -147,7 +132,7 @@ export const useExam = () => {
   };
 
   // -------------------------------------------------------
-  // 📌 Kolla om alla frågor är besvarade
+  // 📌 Alla frågor besvarade
   // -------------------------------------------------------
   const allAnswered =
     examData && Object.keys(answers).length === examData.questions.length;
@@ -157,19 +142,25 @@ export const useExam = () => {
   // -------------------------------------------------------
   const finishExam = async () => {
     const userId = getCurrentUserId();
-    if (!userId) return;
+    if (!userId) {
+      setError("Du måste vara inloggad");
+      return;
+    }
 
-    await examService.finishExam(userId);
-    
-    // Hämta resultat
-    const examResult = await examService.getExamResult(userId); 
-    setResult(examResult); 
-    setShowResult(true); 
-    setStarted(false); 
+    try {
+      await examService.finishExam(userId);
+      const examResult = await examService.getExamResult(userId);
+      setResult(examResult);
+      setShowResult(true);
+      setStarted(false);
+      setError(null);
+    } catch (err) {
+      setError("Kunde inte avsluta provet. Försök igen senare.");
+    }
   };
 
   // -------------------------------------------------------
-  // 📌 Returnera all funktionalitet som komponenten behöver
+  // 📌 Returnera all funktionalitet
   // -------------------------------------------------------
   return {
     examData,
@@ -183,7 +174,8 @@ export const useExam = () => {
     startExam,
     finishExam,
     loading,
-    result, 
+    result,
     showResult,
+    error, // <-- här exponerar vi felet
   };
 };

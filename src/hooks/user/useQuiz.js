@@ -1,29 +1,33 @@
 import { useState, useEffect } from "react";
-import getQuestionsBySubject from "../../services/user/quizService";
+import quizService from "../../services/user/quizService";
+import useError from "../useError";
 
-const useQuiz = (subjectId, limit = 10) => {
+const useQuiz = (subjects = [], limit = 10, load = false) => {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+
+  const {error, handleError, clearError } = useError();
 
   useEffect(() => {
+    if (!load || subjects.length === 0) return;
+
     const fetchQuestions = async () => {
       setLoading(true);
-      setError(null);
+      clearError(); // Rensa tidigare fel
       try {
-        const data = await getQuestionsBySubject(subjectId, limit);
+        const data = await quizService.getQuestionsBySubjects(subjects, limit);
         setQuestions(data);
-      } catch (err) {
-        setError(err.message);
+      } catch {
+        handleError(err, "Kunde inte hämta frågor");
       } finally {
         setLoading(false);
       }
     };
 
-    if (subjectId) fetchQuestions();
-  }, [subjectId, limit]);
+    fetchQuestions();
+  }, [subjects, limit, load, handleError, clearError]);
 
-  return { questions, loading, error };
+  return { questions, loading, error, clearError, setQuestions };
 };
 
 export default useQuiz;

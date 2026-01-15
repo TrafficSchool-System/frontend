@@ -1,89 +1,58 @@
-import { useEffect, useState } from "react";
+// src/pages/admin/AdminDashboardPage.jsx
 import { useNavigate } from "react-router-dom";
-import adminAuthService from "../../services/admin/adminAuthService";
 import AdminLayout from "../../components/admin/layout/AdminLayout";
 import StatsCard from "../../components/admin/dashboard/StatsCard";
 import AdminInfoCard from "../../components/admin/dashboard/AdminInfoCard";
-import LoadingSpinner from "../../components/shared/ui/LoadingSpinner";
+import AdminQuickActions from "../../components/admin/dashboard/AdminQuickActions";
+import Button from "../../components/shared/ui/Button";
+import Alert from "../../components/shared/ui/Alert";
+import useAdminDashboardStats from "../../hooks/admin/useAdminDashboardStats";
 
-const AdminDashboard = () => {
-  const [adminUser, setAdminUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+const AdminDashboardPage = () => {
+  const { totalUsers, activeExams, completedExams, loading, error,clearError } = useAdminDashboardStats();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const validateAdmin = async () => {
-      // Validera token mot backend
-      const validAdmin = await adminAuthService.validateAdminToken();
-      
-      if (!validAdmin) {
-        // Token ogiltig → Kicka ut till login
-        navigate("/admin/login");
-        return;
-      }
-
-      // Token giltig → Hämta admin user
-      const admin = adminAuthService.getAdminUser();
-      setAdminUser(admin);
-      setLoading(false);
-    };
-
-    validateAdmin();
-  }, [navigate]);
-
-  if (loading) {
-    return <LoadingSpinner message="Validerar admin-session..." />;
-  }
-
-  if (!adminUser) {
-    return null; // Navigate kommer köra
-  }
-
-  // Stats data (kommer från backend senare)
   const stats = [
     {
-      title: "Totalt Användare",
-      value: null,
-      description: "Data kommer snart",
+      title: "Total Användare",
+      value: loading ? "…" : totalUsers,
       icon: "👥",
-      iconColor: "text-blue-600"
     },
-    {
-      title: "Aktiva Quizzes",
-      value: null,
-      description: "Data kommer snart",
-      icon: "📝",
-      iconColor: "text-green-600"
+    { title: "Aktiva Quizzes",
+      value: loading ? "…" : activeExams, 
+      icon: "📝" 
     },
-    {
-      title: "Genomförda Exams",
-      value: null,
-      description: "Data kommer snart",
-      icon: "🎓",
-      iconColor: "text-purple-600"
-    }
+    { title: "Genomförda Exams",
+      value: loading ? "…" : completedExams, 
+      icon: "🎓" 
+    },
   ];
 
   return (
-    <AdminLayout adminUser={adminUser}>
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {stats.map((stat, index) => (
-          <StatsCard
-            key={index}
-            title={stat.title}
-            value={stat.value}
-            description={stat.description}
-            icon={stat.icon}
-            iconColor={stat.iconColor}
-          />
+    <AdminLayout>
+
+      {/* 🔴 FELMEDDELANDE */}
+      {error && <Alert type="error" message={error} onClose={clearError} className="mb-2" />}
+        
+
+      <div className="grid grid-cols-3 gap-6 mb-8">
+        {stats.map((s, i) => (
+          <StatsCard key={i} {...s} />
         ))}
       </div>
 
-      {/* Admin Info */}
-      <AdminInfoCard adminUser={adminUser} />
+      <AdminInfoCard />
+
+      <AdminQuickActions>
+        <Button onClick={() => navigate("/admin/users")}>
+          Hantera användare
+        </Button>
+        <Button onClick={() => navigate("/admin/excel-files")}>
+          Hantera Excelfiler
+        </Button>
+      </AdminQuickActions>
     </AdminLayout>
   );
 };
 
-export default AdminDashboard;
+export default AdminDashboardPage;
