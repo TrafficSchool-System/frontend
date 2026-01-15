@@ -1,56 +1,51 @@
 import { useEffect, useState } from "react";
 import examService from "../../services/user/examService";
+import useError from "../useError"; // importera vår egna error hook
 
 const getCurrentUserId = () => {
-    const userStr = localStorage.getItem('user'); 
-    if(userStr) {
-        const user = JSON.parse(userStr); 
-        return user.id; 
-    }
-    return null; 
-}; 
+  const userStr = localStorage.getItem('user');
+  if (userStr) {
+    return JSON.parse(userStr).id;
+  }
+  return null;
+};
 
 const useDashboard = () => {
-    const [stats, setStats] = useState(null); 
-    const [recentResults, setRecentResults] = useState([]); 
-    const [loading, setLoading] = useState(true); 
-    const [error, setError] = useState(null); 
+  const [stats, setStats] = useState(null);
+  const [recentResults, setRecentResults] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchDashboardData = async () => {
-            const userId = getCurrentUserId();
-            
-            if(!userId) {
-                setError("Du måste vara inloggad"); 
-                setLoading(false); 
-                return;
-            }
+  const { error, handleError, clearError } = useError(); // använd error hook
 
-            try{
-                setLoading(true); 
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      const userId = getCurrentUserId();
+      if (!userId) {
+        handleError(null, "Du måste vara inloggad"); // custom message
+        setLoading(false);
+        return;
+      }
 
-                // Hämta statestik och resultat parallelt
-                const [statsData, resultsData] = await Promise.all([
-                    examService.getExamStats(userId),
-                    examService.getAllExamResults(userId)
-                ]); 
+      try {
+        setLoading(true);
+        const [statsData, resultsData] = await Promise.all([
+          examService.getExamStats(userId),
+          examService.getAllExamResults(userId)
+        ]);
 
-                setStats(statsData); 
+        setStats(statsData);
+        setRecentResults(resultsData.slice(0, 5));
+      } catch (err) {
+        handleError(err, "Kunde inte ladda dashboard"); // custom message
+      } finally {
+        setLoading(false);
+      }
+    };
 
-                // Ta bara de 5 senaste resultaten 
-                setRecentResults(resultsData.slice(0, 5)); 
+    fetchDashboardData();
+  }, [handleError]);
 
-            } catch (err) {
-                console.error("Fel vid hämtning av dashboard-data: ", err);
-                setError("Kunde inte ladda dashboard"); 
-            } finally {
-                setLoading(false); 
-            }
-        }; 
-        fetchDashboardData(); 
-    }, []);
+  return { stats, recentResults, loading, error, clearError }; // clearError för Alert
+};
 
-    return { stats, recentResults, loading, error }; 
-}; 
-
-export default useDashboard; 
+export default useDashboard;

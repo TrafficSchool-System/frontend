@@ -1,19 +1,26 @@
-import ExamResultSummary from './ExamResultSummary';
-import ExamResultQuestion from './ExamResultQuestion';
-import Button from '../../shared/ui/Button';
-import LoadingSpinner from '../../shared/ui/LoadingSpinner';
+import ExamResultSummary from "./ExamResultSummary";
+import ExamResultQuestion from "./ExamResultQuestion";
+import Button from "../../shared/ui/Button";
+import LoadingSpinner from "../../shared/ui/LoadingSpinner";
 
 const ExamResult = ({ result, onRetry }) => {
   if (!result) {
-    return <LoadingSpinner message="Laddar resultat..." fullScreen={false} size="small" gradient={false} />;
+    return (
+      <LoadingSpinner
+        message="Laddar resultat..."
+        fullScreen={false}
+        size="small"
+        gradient={false}
+      />
+    );
   }
 
   const { score, passed, questions, userAnswers, timeTaken } = result;
   const total = questions.length;
 
   // Beräkna statistik
-  const correctCount = questions.filter((q, index) => 
-    userAnswers[q.id] === q.answers[q.correctAnswerIndex]
+  const correctCount = questions.filter(
+    (q, index) => userAnswers[q.id] === q.answers[q.correctAnswerIndex]
   ).length;
   const wrongCount = total - correctCount;
 
@@ -21,10 +28,10 @@ const ExamResult = ({ result, onRetry }) => {
     <div className="min-h-screen bg-linear-to-br from-gray-50 to-blue-50 py-8 px-4">
       <div className="max-w-5xl mx-auto">
         {/* Summary Section */}
-        <ExamResultSummary 
-          score={score} 
-          total={total} 
-          passed={passed} 
+        <ExamResultSummary
+          score={score}
+          total={total}
+          passed={passed}
           timeTaken={timeTaken}
         />
 
@@ -44,11 +51,15 @@ const ExamResult = ({ result, onRetry }) => {
             </div>
             <div className="hidden md:flex gap-4">
               <div className="text-center px-4">
-                <div className="text-2xl font-bold text-green-600">{correctCount}</div>
+                <div className="text-2xl font-bold text-green-600">
+                  {correctCount}
+                </div>
                 <div className="text-xs text-gray-600 uppercase">Rätt</div>
               </div>
               <div className="text-center px-4">
-                <div className="text-2xl font-bold text-red-600">{wrongCount}</div>
+                <div className="text-2xl font-bold text-red-600">
+                  {wrongCount}
+                </div>
                 <div className="text-xs text-gray-600 uppercase">Fel</div>
               </div>
             </div>
@@ -59,7 +70,8 @@ const ExamResult = ({ result, onRetry }) => {
         <div className="mb-8">
           {questions.map((question, index) => {
             const userAnswer = userAnswers[question.id];
-            const isCorrect = userAnswer === question.answers[question.correctAnswerIndex];
+            const isCorrect =
+              userAnswer === question.answers[question.correctAnswerIndex];
 
             return (
               <div
@@ -83,14 +95,11 @@ const ExamResult = ({ result, onRetry }) => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               variant="secondary"
-              onClick={() => window.location.href = '/'}
+              onClick={() => (window.location.href = "/")}
             >
               ← Tillbaka till Dashboard
             </Button>
-            <Button
-              variant="primary"
-              onClick={onRetry}
-            >
+            <Button variant="primary" onClick={onRetry}>
               🔄 Gör om provet
             </Button>
           </div>

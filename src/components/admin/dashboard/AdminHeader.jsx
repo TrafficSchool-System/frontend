@@ -3,7 +3,7 @@ const AdminHeader = ({ adminUser, onLogout }) => {
     <header className="bg-white shadow">
       <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Admin</h1>
           {adminUser && (
             <p className="text-gray-600 mt-1">
               Välkommen, {adminUser.firstName} {adminUser.lastName}

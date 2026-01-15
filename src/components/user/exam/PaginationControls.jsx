@@ -1,4 +1,4 @@
-import Button from '../../shared/ui/Button';
+
 
 const PaginationControls = ({ currentPage, totalPages, onPageChange }) => {
   if (totalPages <= 1) return null;

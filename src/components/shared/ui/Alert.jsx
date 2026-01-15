@@ -1,51 +1,53 @@
-const Alert = ({ 
+const Alert = ({
   message,
-  type = 'info', // 'success', 'error', 'warning', 'info'
+  children, // Lägg till children prop
+  type = "info", // 'success', 'error', 'warning', 'info'
   onClose,
-  className = ''
+  className = "",
 }) => {
-  if (!message) return null;
+  // Om varken message eller children finns, visa inget
+  if (!message && !children) return null;
 
   const variants = {
     success: {
-      bg: 'bg-green-50',
-      border: 'border-green-400',
-      text: 'text-green-800',
-      icon: '✓'
+      bg: "bg-green-50",
+      border: "border-green-400",
+      text: "text-green-800",
+      icon: "✓",
     },
     error: {
-      bg: 'bg-red-50',
-      border: 'border-red-400',
-      text: 'text-red-800',
-      icon: '⚠️'
+      bg: "bg-red-50",
+      border: "border-red-400",
+      text: "text-red-800",
+      icon: "⚠️",
     },
     warning: {
-      bg: 'bg-yellow-50',
-      border: 'border-yellow-400',
-      text: 'text-yellow-800',
-      icon: '⚡'
+      bg: "bg-yellow-50",
+      border: "border-yellow-400",
+      text: "text-yellow-800",
+      icon: "⚡",
     },
     info: {
-      bg: 'bg-blue-50',
-      border: 'border-blue-400',
-      text: 'text-blue-800',
-      icon: 'ℹ️'
-    }
+      bg: "bg-blue-50",
+      border: "border-blue-400",
+      text: "text-blue-800",
+      icon: "ℹ️",
+    },
   };
 
   const variant = variants[type] || variants.info;
 
   return (
-    <div className={`
-      rounded-2xl p-4 border-2 flex items-start gap-3
+    <div
+      className={`
+      rounded-2xl p-4 border-2 flex items-start gap-3 mb-4
       ${variant.bg} ${variant.border} ${className}
-    `}>
-      <span className="text-2xl shrink-0">
-        {variant.icon}
-      </span>
-      <p className={`font-medium flex-1 ${variant.text}`}>
-        {message}
-      </p>
+    `}
+    >
+      <span className="text-2xl shrink-0">{variant.icon}</span>
+      <div className={`font-medium flex-1 ${variant.text}`}>
+        {children || message}
+      </div>
       {onClose && (
         <button
           onClick={onClose}
