@@ -81,7 +81,14 @@ const CompleteUserManagementPage = () => {
 
   return (
     <AdminLayout>
-      {error && <Alert type="error" message={error} onClose={clearError} />}
+      {/* Visa fel enbart när användarlistan redan är laddad (t.ex. misslyckad radering) */}
+      {error && users.length > 0 && (
+        <Alert
+          type="error"
+          message={Array.isArray(error) ? error.join(" ") : error}
+          onClose={clearError}
+        />
+      )}
       {createError && (
         <Alert
           type="error"

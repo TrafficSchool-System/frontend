@@ -92,8 +92,8 @@ const AdminExcelPage = () => {
         ]}
       />
 
-      {/* Errors */}
-      {excelError && (
+      {/* Fel vid uppladdning/borttagning av Excel-filer (visa bara när filer finns) */}
+      {excelError && files.length > 0 && (
         <Alert type="error" onClose={clearExcelError} className="mb-6">
           <ul className="list-disc ml-4">
             {(Array.isArray(excelError) ? excelError : [excelError]).map(
@@ -104,10 +104,15 @@ const AdminExcelPage = () => {
           </ul>
         </Alert>
       )}
-      {questionError && (
+      {/* Fel vid hämtning av frågor (visa bara när frågor finns) */}
+      {questionError && allQuestions.length > 0 && (
         <Alert
           type="error"
-          message={questionError}
+          message={
+            Array.isArray(questionError)
+              ? questionError.join(" ")
+              : questionError
+          }
           onClose={clearQuestionError}
           className="mb-6"
         />
@@ -126,7 +131,14 @@ const AdminExcelPage = () => {
           ) : (
             <div className="space-y-6">
               <ExcelFileUpload onUpload={uploadFile} />
-              <ExcelFileList files={files} onDelete={deleteFile} />
+              {excelError && files.length === 0 ? (
+                <p className="text-center text-sm text-gray-500 py-4">
+                  Kunde inte hämta uppladdade filer just nu. Uppladdning
+                  fungerar fortfarande.
+                </p>
+              ) : (
+                <ExcelFileList files={files} onDelete={deleteFile} />
+              )}
             </div>
           )}
         </Card.Body>
@@ -177,6 +189,26 @@ const AdminExcelPage = () => {
           {/* List */}
           {questionLoading ? (
             <LoadingSpinner message="Hämtar frågor..." />
+          ) : allQuestions.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-4xl mb-3">✏️</div>
+              <h3 className="text-base font-semibold text-gray-700 mb-1">
+                Inga frågor importerade ännu
+              </h3>
+              <p className="text-sm text-gray-500">
+                {questionError
+                  ? "Frågetjänsten svarar inte just nu. Försök ladda om sidan."
+                  : "Ladda upp en Excel-fil ovan för att importera frågor till frågebanken."}
+              </p>
+              {questionError && (
+                <button
+                  onClick={fetchAllQuestions}
+                  className="mt-4 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                >
+                  Försök igen
+                </button>
+              )}
+            </div>
           ) : (
             <ScrollableQuestionList
               questions={questions}

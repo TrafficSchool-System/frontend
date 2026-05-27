@@ -252,8 +252,8 @@ const PackageManagementPage = () => {
         }
       />
 
-      {/* Alerts */}
-      {error && (
+      {/* Alerts – visa fel enbart när det finns paket (t.ex. vid misslyckad redigering) */}
+      {error && packages.length > 0 && (
         <Alert
           type="error"
           message={error}
@@ -292,15 +292,45 @@ const PackageManagementPage = () => {
         />
       </div>
 
-      {/* Packages Table */}
-      <DataTable
-        columns={columns}
-        data={packages}
-        renderCell={renderCell}
-        emptyMessage="Inga paket hittades i systemet"
-        striped
-        hoverable
-      />
+      {/* Packages Table or empty state */}
+      {!loading && packages.length === 0 ? (
+        <div className="text-center py-16 bg-white rounded-2xl border border-gray-200">
+          <div className="text-5xl mb-4">📦</div>
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">
+            Inga paket tillagda ännu
+          </h3>
+          <p className="text-gray-500 text-sm mb-6">
+            {error
+              ? "Det gick inte att ansluta till pakettjänsten just nu. Försök igen eller skapa ett nytt paket."
+              : "Inga prenumerationspaket finns i systemet. Kom igång genom att skapa ditt första paket."}
+          </p>
+          <div className="flex gap-3 justify-center">
+            {error && (
+              <button
+                onClick={fetchPackages}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+              >
+                Försök igen
+              </button>
+            )}
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+            >
+              + Skapa nytt paket
+            </button>
+          </div>
+        </div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={packages}
+          renderCell={renderCell}
+          emptyMessage="Inga paket hittades i systemet"
+          striped
+          hoverable
+        />
+      )}
 
       {/* Create Package Modal */}
       <PackageFormModal
