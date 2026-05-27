@@ -29,6 +29,12 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
+      - name: Rensa API URL
+        id: apiurl
+        run: |
+          CLEAN=$(echo "${{ secrets.VITE_API_BASE_URL }}" | tr -d '[:space:]' | sed 's|[./]*$||')
+          echo "value=$CLEAN" >> $GITHUB_OUTPUT
+
       - name: Bygg och pusha Docker-image
         uses: docker/build-push-action@v5
         with:
@@ -36,7 +42,7 @@ jobs:
           push: true
           tags: ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.APP_NAME }}:latest
           build-args: |
-            VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}
+            VITE_API_BASE_URL=${{ steps.apiurl.outputs.value }}
 
       - name: Driftsätt till Azure Container Apps
         run: |
