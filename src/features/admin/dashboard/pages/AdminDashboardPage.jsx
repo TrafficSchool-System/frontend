@@ -39,11 +39,11 @@ const AdminDashboardPage = () => {
         icon="📊"
       />
 
-      {/* Felmeddelande */}
+      {/* Varning när en tjänst inte svarar – inte kritiskt fel */}
       {error && (
         <Alert
-          type="error"
-          message={error}
+          type="warning"
+          message={Array.isArray(error) ? error.join(" ") : error}
           onClose={clearError}
           className="mb-6"
         />

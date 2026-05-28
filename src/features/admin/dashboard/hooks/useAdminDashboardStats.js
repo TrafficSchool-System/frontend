@@ -14,20 +14,29 @@ const useAdminDashboardStats = () => {
 
   useEffect(() => {
     const fetchStats = async () => {
-      try {
-        const [users, examCounts] = await Promise.all([
-          userService.getTotalUsers(),
-          examService.getExamCounts(),
-        ]);
+      const [usersResult, examResult] = await Promise.allSettled([
+        userService.getTotalUsers(),
+        examService.getExamCounts(),
+      ]);
 
-        setTotalUsers(users);
-        setActiveExams(examCounts.activeExams);
-        setCompletedExams(examCounts.completedExams);
-      } catch (err) {
-        handleError(err, "Kunde inte hämta admin-statistik");
-      } finally {
-        setLoading(false);
+      if (usersResult.status === "fulfilled") {
+        setTotalUsers(usersResult.value);
       }
+      if (examResult.status === "fulfilled") {
+        setActiveExams(examResult.value.activeExams ?? 0);
+        setCompletedExams(examResult.value.completedExams ?? 0);
+      }
+
+      const anyFailed =
+        usersResult.status === "rejected" || examResult.status === "rejected";
+      if (anyFailed) {
+        handleError(
+          null,
+          "En eller flera tjänster svarar inte just nu — statistiken kan vara ofullständig.",
+        );
+      }
+
+      setLoading(false);
     };
 
     fetchStats();
