@@ -49,9 +49,16 @@ const validateAdminToken = async () => {
     });
     return response.data; // { adminId, username, role: "ADMIN" }
   } catch (error) {
-    // Token invalid - clear localStorage
-    logoutAdmin();
-    return null;
+    // Logga bara ut vid 401 (token verkligen ogiltig)
+    if (error.response?.status === 401) {
+      logoutAdmin();
+      return null;
+    }
+    // Vid nätverksfel / 500 — behåll inloggad med cachad data
+    console.warn(
+      "⚠️ validateAdminToken misslyckades (nätverk/server), använder cachad admin-data",
+    );
+    return getAdminUser();
   }
 };
 
