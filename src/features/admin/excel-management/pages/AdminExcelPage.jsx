@@ -4,7 +4,7 @@
  * ==========================================
  */
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AdminLayout from "../../shared/components/AdminLayout";
 import PageHeader from "@shared/components/ui/PageHeader";
 import Card from "@shared/components/ui/Card";
@@ -67,10 +67,27 @@ const AdminExcelPage = () => {
     updateQuestion,
   } = useAdminQuestions();
 
+  const [uploadFeedback, setUploadFeedback] = useState(null);
+
   const handleUploadAndRefresh = async (file, dryRun = false) => {
-    const result = await uploadFile(file, dryRun);
-    await fetchAllQuestions();
-    return result;
+    setUploadFeedback(null);
+    try {
+      const result = await uploadFile(file, dryRun);
+      await fetchAllQuestions();
+      setUploadFeedback({ type: "success", messages: [result ?? "Uppladdning lyckades!"] });
+    } catch (err) {
+      let messages = [];
+      if (err?.response?.data?.errors && Array.isArray(err.response.data.errors)) {
+        messages = err.response.data.errors;
+      } else if (err?.response?.data?.message) {
+        messages = [err.response.data.message];
+      } else if (err?.message) {
+        messages = [err.message];
+      } else {
+        messages = ["Uppladdningen misslyckades. Försök igen."];
+      }
+      setUploadFeedback({ type: "error", messages });
+    }
   };
 
   const handleDeleteAndRefresh = async (id) => {
@@ -139,6 +156,23 @@ const AdminExcelPage = () => {
           icon="📤"
         />
         <Card.Body>
+          {/* Feedback för uppladdning (överlever loading-cykeln) */}
+          {uploadFeedback?.type === "success" && (
+            <div className="mb-4 p-3 bg-green-50 border border-green-300 rounded-lg text-green-800 text-sm font-medium">
+              ✅ {uploadFeedback.messages[0]}
+            </div>
+          )}
+          {uploadFeedback?.type === "error" && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-300 rounded-lg">
+              <p className="text-red-800 font-semibold text-sm mb-1">⚠️ Uppladdningen misslyckades:</p>
+              <ul className="list-disc ml-5 text-red-700 text-sm space-y-0.5">
+                {uploadFeedback.messages.map((m, i) => (
+                  <li key={i}>{m}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {excelLoading ? (
             <LoadingSpinner message="Hämtar Excel-filer..." />
           ) : (
