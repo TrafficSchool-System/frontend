@@ -66,6 +66,18 @@ const AdminExcelPage = () => {
     updateQuestion,
   } = useAdminQuestions();
 
+  const handleUploadAndRefresh = async (file, dryRun = false) => {
+    const result = await uploadFile(file, dryRun);
+    await fetchAllQuestions();
+    return result;
+  };
+
+  const handleDeleteAndRefresh = async (id) => {
+    const result = await deleteFile(id);
+    await fetchAllQuestions();
+    return result;
+  };
+
   useEffect(() => {
     fetchAllQuestions();
   }, [fetchAllQuestions]);
@@ -92,8 +104,8 @@ const AdminExcelPage = () => {
         ]}
       />
 
-      {/* Fel vid uppladdning/borttagning av Excel-filer (visa bara när filer finns) */}
-      {excelError && files.length > 0 && (
+      {/* Fel vid uppladdning/borttagning av Excel-filer */}
+      {excelError && (
         <Alert type="error" onClose={clearExcelError} className="mb-6">
           <ul className="list-disc ml-4">
             {(Array.isArray(excelError) ? excelError : [excelError]).map(
@@ -130,14 +142,14 @@ const AdminExcelPage = () => {
             <LoadingSpinner message="Hämtar Excel-filer..." />
           ) : (
             <div className="space-y-6">
-              <ExcelFileUpload onUpload={uploadFile} />
+              <ExcelFileUpload onUpload={handleUploadAndRefresh} />
               {excelError && files.length === 0 ? (
                 <p className="text-center text-sm text-gray-500 py-4">
                   Kunde inte hämta uppladdade filer just nu. Uppladdning
                   fungerar fortfarande.
                 </p>
               ) : (
-                <ExcelFileList files={files} onDelete={deleteFile} />
+                <ExcelFileList files={files} onDelete={handleDeleteAndRefresh} />
               )}
             </div>
           )}
