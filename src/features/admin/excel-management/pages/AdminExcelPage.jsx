@@ -51,6 +51,7 @@ const AdminExcelPage = () => {
     loading: excelLoading,
     error: excelError,
     clearError: clearExcelError,
+    fetchFiles,
     uploadFile,
     deleteFile,
   } = useExcelFiles();
@@ -144,10 +145,28 @@ const AdminExcelPage = () => {
             <div className="space-y-6">
               <ExcelFileUpload onUpload={handleUploadAndRefresh} />
               {excelError && files.length === 0 ? (
-                <p className="text-center text-sm text-gray-500 py-4">
-                  Kunde inte hämta uppladdade filer just nu. Uppladdning
-                  fungerar fortfarande.
-                </p>
+                <div className="py-4 space-y-3">
+                  <p className="text-center text-sm text-gray-500">
+                    Kunde inte hämta uppladdade filer just nu.
+                  </p>
+                  <div className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3">
+                    <ul className="list-disc ml-4">
+                      {(Array.isArray(excelError) ? excelError : [excelError]).map(
+                        (e, i) => (
+                          <li key={i}>{e}</li>
+                        ),
+                      )}
+                    </ul>
+                  </div>
+                  <div className="text-center">
+                    <button
+                      onClick={fetchFiles}
+                      className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                    >
+                      Försök igen
+                    </button>
+                  </div>
+                </div>
               ) : (
                 <ExcelFileList files={files} onDelete={handleDeleteAndRefresh} />
               )}
