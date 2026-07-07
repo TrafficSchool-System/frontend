@@ -28,16 +28,14 @@ const useExcelFiles = () => {
       setLoading(true);
       try {
         const message = await quizService.uploadExcelFile(file, dryRun);
-        await fetchFiles(); // uppdatera listan
         return message;
       } catch (err) {
-        // Kasta vidare – ExcelFileUpload-komponenten visar felet inline
         throw err;
       } finally {
         setLoading(false);
       }
     },
-    [fetchFiles]
+    []
   );
 
   // Ta bort Excel-fil

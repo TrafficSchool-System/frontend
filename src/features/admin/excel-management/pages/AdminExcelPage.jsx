@@ -73,8 +73,10 @@ const AdminExcelPage = () => {
     setUploadFeedback(null);
     try {
       const result = await uploadFile(file, dryRun);
-      await fetchAllQuestions();
+      // Visa success direkt – refresha sedan i bakgrunden utan await
       setUploadFeedback({ type: "success", messages: [result ?? "Uppladdning lyckades!"] });
+      fetchFiles();
+      fetchAllQuestions();
     } catch (err) {
       let messages = [];
       if (err?.response?.data?.errors && Array.isArray(err.response.data.errors)) {
