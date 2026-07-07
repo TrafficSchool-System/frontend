@@ -51,13 +51,16 @@ const getAllExcelFiles = async () => {
 /**
  * Upload Excel file with quiz questions (admin only)
  * POST /api/admin/quizzes/imports
+ * Timeout: 3 minuter – Excel-import kan ta 20-30 sekunder för stora filer
  */
 const uploadExcelFile = async (file, dryRun = false) => {
   const formData = new FormData();
   formData.append("file", file);
   formData.append("dryRun", dryRun.toString());
 
-  const response = await axios.post(ADMIN_ENDPOINTS.QUIZ_IMPORT, formData);
+  const response = await axios.post(ADMIN_ENDPOINTS.QUIZ_IMPORT, formData, {
+    timeout: 180000, // 3 minuter
+  });
   return response.data;
 };
 
