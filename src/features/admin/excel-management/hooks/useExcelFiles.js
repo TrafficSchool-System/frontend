@@ -25,14 +25,11 @@ const useExcelFiles = () => {
   // Ladda upp Excel-fil
   const uploadFile = useCallback(
     async (file, dryRun = false) => {
-      setLoading(true);
       try {
         const message = await quizService.uploadExcelFile(file, dryRun);
         return message;
       } catch (err) {
         throw err;
-      } finally {
-        setLoading(false);
       }
     },
     []
