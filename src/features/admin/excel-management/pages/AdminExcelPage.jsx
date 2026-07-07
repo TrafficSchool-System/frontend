@@ -73,9 +73,8 @@ const AdminExcelPage = () => {
     setUploadFeedback(null);
     try {
       const result = await uploadFile(file, dryRun);
-      // Visa success direkt – refresha sedan i bakgrunden utan await
       setUploadFeedback({ type: "success", messages: [result ?? "Uppladdning lyckades!"] });
-      fetchFiles();
+      // Refresha bara frågor (inte fillistan – den misslyckas direkt efter stor upload)
       fetchAllQuestions();
     } catch (err) {
       let messages = [];
@@ -180,7 +179,7 @@ const AdminExcelPage = () => {
           ) : (
             <div className="space-y-6">
               <ExcelFileUpload onUpload={handleUploadAndRefresh} />
-              {excelError && files.length === 0 ? (
+              {excelError && files.length === 0 && uploadFeedback?.type !== "success" ? (
                 <div className="py-4 space-y-3">
                   <p className="text-center text-sm text-gray-500">
                     Kunde inte hämta uppladdade filer just nu.
