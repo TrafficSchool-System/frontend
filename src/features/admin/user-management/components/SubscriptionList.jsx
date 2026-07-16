@@ -9,7 +9,9 @@
  * - Exakt tidsinformation (timmar)
  */
 
-const SubscriptionList = ({ subscriptions }) => {
+import ExtendSubscriptionModal from "./ExtendSubscriptionModal";
+
+const SubscriptionList = ({ subscriptions, onRefresh }) => {
   if (!subscriptions || subscriptions.length === 0) {
     return (
       <div className="bg-white rounded-lg p-6 border border-gray-200">
@@ -253,6 +255,14 @@ const SubscriptionList = ({ subscriptions }) => {
                 </p>
               </div>
             )}
+
+            {/* Admin: Förläng prenumeration */}
+            <div className="mt-3 flex justify-end">
+              <ExtendSubscriptionModal
+                subscriptionUserId={sub.userId}
+                onExtended={onRefresh}
+              />
+            </div>
           </div>
         ))}
       </div>

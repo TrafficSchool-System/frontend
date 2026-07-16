@@ -103,20 +103,18 @@ const ActiveQuizPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 to-blue-50 py-8 px-4">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-blue-50 py-6 px-4">
       {error && <Alert type="error" message={error} onClose={clearError} />}
 
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-4xl mx-auto space-y-4">
         <ProgressBar
           answered={answeredCount}
           total={questions.length}
-          className="mb-6"
         />
         <QuizCard
           question={currentQuestion}
           selectedAnswer={answers[currentIndex] || null}
           onSelect={handleSelect}
-          className="mb-6"
         />
         <QuizNavigation
           currentIndex={currentIndex}

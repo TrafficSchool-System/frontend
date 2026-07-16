@@ -14,6 +14,7 @@
  */
 
 import { useState } from "react";
+import ExtendSubscriptionModal from "./ExtendSubscriptionModal";
 import {
   CheckCircleIcon,
   XCircleIcon,
@@ -24,7 +25,7 @@ import {
   CreditCardIcon,
 } from "@heroicons/react/24/outline";
 
-const SubscriptionSummary = ({ subscriptions, statistics }) => {
+const SubscriptionSummary = ({ subscriptions, statistics, onRefresh }) => {
   const [showHistory, setShowHistory] = useState(false);
 
   // Ingen prenumeration alls
@@ -210,6 +211,14 @@ const SubscriptionSummary = ({ subscriptions, statistics }) => {
               </p>
             </div>
           )}
+        </div>
+
+        {/* Admin: Förläng prenumeration */}
+        <div className="mt-4 flex justify-end">
+          <ExtendSubscriptionModal
+            subscriptionUserId={currentSubscription.userId}
+            onExtended={onRefresh}
+          />
         </div>
 
         {/* Historik-knapp */}

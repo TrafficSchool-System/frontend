@@ -15,7 +15,7 @@ const SfiHint = ({ sfiText }) => {
                 onClick={ () => setVisible(!visible)}
                 className="px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
             >
-                {visible ? "Dölj SFI-hjälp" : "Visa SFI-hjälp"}
+                {visible ? "Dölj NPF-hjälp" : "Visa NPF-hjälp"}
             </button>
 
             {visible && (

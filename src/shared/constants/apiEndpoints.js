@@ -201,6 +201,9 @@ export const ADMIN_ENDPOINTS = {
   /** DELETE - Delete user (permanent) */
   USER_DELETE: (userId) => `${API_BASE}/admin/users/${userId}`,
 
+  /** PUT - Extend user subscription (admin only) */
+  USER_EXTEND_SUBSCRIPTION: (userId) => `${API_BASE}/admin/users/${userId}/subscription/extend`,
+
   /** GET - Get user statistics */
   USER_STATISTICS: `${API_BASE}/admin/users/statistics`,
 
