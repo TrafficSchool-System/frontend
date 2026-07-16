@@ -80,6 +80,19 @@ const userManagementService = {
     );
     return response.data;
   },
+
+  /**
+  * Extend student subscription
+  * PUT /api/admin/users/{userId}/subscription/extend
+  */
+
+  async extendSubscription(userId, days){
+    const response = await axios.put(
+      `${ADMIN_ENDPOINTS.USERS}/${userId}/subscription/extend`,
+      { days }
+    ); 
+    return response.data;
+  }
 };
 
 export default userManagementService;

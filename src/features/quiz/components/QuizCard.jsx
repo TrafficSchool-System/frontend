@@ -52,26 +52,6 @@ const QuizCard = ({
       <div className="p-6">
         <SfiHint sfiText={question.sfi} />
 
-        {/* Visa bild om den finns */}
-        {imageUrl && (
-          <div className="mb-6">
-            {/* Thumbnail som man kan klicka på */}
-            <img
-              src={imageUrl}
-              alt="Fråga bild"
-              className="w-full rounded-xl shadow-lg border-2 border-gray-200 hover:scale-105 transition-transform duration-300 cursor-pointer"
-              onClick={() => setIsImageOpen(true)}
-              onError={(e) => {
-                e.target.style.display = "none";
-                console.error("Kunde inte ladda bild:", question.image);
-              }}
-            />
-            <p className="text-xs text-gray-500 mt-2 text-center">
-              🔍 Klicka på bilden för att förstora
-            </p>
-          </div>
-        )}
-
         {/* Modal för fullskärmsbild */}
         <ImageModal
           imageUrl={imageUrl}
@@ -79,112 +59,95 @@ const QuizCard = ({
           onClose={() => setIsImageOpen(false)}
         />
 
-        {/* Answer Options */}
-        <div className="space-y-3">
-          {/* Loopa igenom alla svarsalternativ */}
-          {question.answers.map((ans, i) => {
-            // Bestäm stil när feedback visas
-            let answerStyle = "";
-            let iconDisplay = null;
+        {/* Layout: bild + svar sida vid sida på desktop, staplade på mobil */}
+        <div className={`flex gap-6 ${imageUrl ? "flex-col md:flex-row" : "flex-col"}`}>
 
-            if (showAnswerFeedback && selectedAnswer) {
-              // Grönt för rätt svar
-              if (i === question.correctAnswerIndex) {
-                answerStyle = "bg-green-50 border-green-400 hover:bg-green-100";
-                iconDisplay = <span className="text-2xl">✓</span>;
-              }
-              // Rött för fel svar
-              else if (ans === selectedAnswer) {
-                answerStyle = "bg-red-50 border-red-400 hover:bg-red-100";
-                iconDisplay = <span className="text-2xl">✗</span>;
-              }
-            }
-
-            const isSelected = selectedAnswer === ans;
-
-            return (
-              <label
-                key={i}
-                className={`
-                  flex items-center gap-4 p-4 border-2 rounded-xl transition-all duration-300
-                  ${
-                    answerLocked
-                      ? "cursor-not-allowed"
-                      : "cursor-pointer hover:shadow-md hover:scale-[1.02]"
-                  }
-                  ${
-                    isSelected && !showAnswerFeedback
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-gray-200"
-                  }
-                  ${answerStyle}
-                `}
-              >
-                {/* Custom Radio Button */}
-                <div className="relative shrink-0">
-                  <input
-                    type="radio"
-                    name={`answer-${question.id}`}
-                    checked={isSelected}
-                    onChange={() => onSelect(ans)}
-                    disabled={answerLocked}
-                    className="sr-only"
-                  />
-                  <div
-                    className={`
-                    w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all
-                    ${
-                      isSelected
-                        ? "border-blue-600 bg-blue-600"
-                        : "border-gray-300 bg-white"
-                    }
-                    ${!answerLocked && "group-hover:border-blue-400"}
-                  `}
-                  >
-                    {isSelected && (
-                      <div className="w-2 h-2 bg-white rounded-full"></div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Answer Text */}
-                <span
-                  className={`flex-1 text-lg ${
-                    isSelected ? "font-semibold" : "font-medium"
-                  } text-gray-800`}
-                >
-                  {ans}
-                </span>
-
-                {/* Feedback Icon */}
-                {iconDisplay && <div className="shrink-0">{iconDisplay}</div>}
-              </label>
-            );
-          })}
-        </div>
-
-        {/* Visa förklaring när:
-            ✓ feedback är påslagen
-            ✓ svaret är låst
-            ✓ frågan har en förklarings-text */}
-
-        {showAnswerFeedback &&
-          answerLocked &&
-          question.explinationForStudent && (
-            <div className="mt-6 p-5 bg-linear-to-r from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-xl shadow-md">
-              <div className="flex items-start gap-3">
-                <span className="text-3xl shrink-0">💡</span>
-                <div>
-                  <h3 className="font-bold text-blue-800 text-lg mb-2">
-                    Förklaring:
-                  </h3>
-                  <p className="text-blue-900 leading-relaxed">
-                    {question.explinationForStudent}
-                  </p>
-                </div>
-              </div>
+          {/* Bild (vänster kolumn på desktop) */}
+          {imageUrl && (
+            <div className="md:w-2/5 shrink-0">
+              <img
+                src={imageUrl}
+                alt="Fråga bild"
+                className="w-full max-h-44 md:max-h-80 object-contain rounded-xl shadow-lg border-2 border-gray-200 cursor-pointer hover:scale-105 transition-transform duration-300"
+                onClick={() => setIsImageOpen(true)}
+                onError={(e) => {
+                  e.target.style.display = "none";
+                }}
+              />
+              <p className="text-xs text-gray-500 mt-1 text-center">
+                🔍 Klicka på bilden för att förstora
+              </p>
             </div>
           )}
+
+          {/* Svarsalternativ (höger kolumn på desktop) */}
+          <div className="flex-1">
+            <div className="space-y-3">
+              {question.answers.map((ans, i) => {
+                let answerStyle = "";
+                let iconDisplay = null;
+
+                if (showAnswerFeedback && selectedAnswer) {
+                  if (i === question.correctAnswerIndex) {
+                    answerStyle = "bg-green-50 border-green-400 hover:bg-green-100";
+                    iconDisplay = <span className="text-2xl">✓</span>;
+                  } else if (ans === selectedAnswer) {
+                    answerStyle = "bg-red-50 border-red-400 hover:bg-red-100";
+                    iconDisplay = <span className="text-2xl">✗</span>;
+                  }
+                }
+
+                const isSelected = selectedAnswer === ans;
+
+                return (
+                  <label
+                    key={i}
+                    className={`
+                      flex items-center gap-4 p-4 border-2 rounded-xl transition-all duration-300
+                      ${answerLocked ? "cursor-not-allowed" : "cursor-pointer hover:shadow-md hover:scale-[1.02]"}
+                      ${isSelected && !showAnswerFeedback ? "border-blue-500 bg-blue-50" : "border-gray-200"}
+                      ${answerStyle}
+                    `}
+                  >
+                    <div className="relative shrink-0">
+                      <input
+                        type="radio"
+                        name={`answer-${question.id}`}
+                        checked={isSelected}
+                        onChange={() => onSelect(ans)}
+                        disabled={answerLocked}
+                        className="sr-only"
+                      />
+                      <div className={`
+                        w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all
+                        ${isSelected ? "border-blue-600 bg-blue-600" : "border-gray-300 bg-white"}
+                      `}>
+                        {isSelected && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                      </div>
+                    </div>
+                    <span className={`flex-1 text-lg ${isSelected ? "font-semibold" : "font-medium"} text-gray-800`}>
+                      {ans}
+                    </span>
+                    {iconDisplay && <div className="shrink-0">{iconDisplay}</div>}
+                  </label>
+                );
+              })}
+            </div>
+
+            {/* Förklaring */}
+            {showAnswerFeedback && answerLocked && question.explinationForStudent && (
+              <div className="mt-4 p-4 bg-linear-to-r from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-xl shadow-md">
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl shrink-0">💡</span>
+                  <div>
+                    <h3 className="font-bold text-blue-800 mb-1">Förklaring:</h3>
+                    <p className="text-blue-900 leading-relaxed">{question.explinationForStudent}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

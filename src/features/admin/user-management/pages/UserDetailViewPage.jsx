@@ -168,6 +168,7 @@ const UserDetailViewPage = () => {
         <SubscriptionSummary
           subscriptions={subscriptions}
           statistics={statistics}
+          onRefresh={refetch}
         />
 
         {/* Betalningar */}
